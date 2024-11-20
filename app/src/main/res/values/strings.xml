@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Submission Intermediate</string>
+    <string name="login">Login</string>
+    <string name="daftar">Daftar</string>
+    <string name="belum_punya_akun">Belum Punya Akun?</string>
+    <string name="sudah_punya_akun">Sudah Punya Akun?</string>
+    <string name="nama">Masukkan nama</string>
+    <string name="email">Masukkan email</string>
+    <string name="password">Masukkan password</string>
+    <string name="image">Image</string>
+    <string name="name">Nama</string>
+    <string name="status">Status</string>
+    <string name="logout">Logout</string>
+    <string name="description">Description\n</string>
+    <string name="fab">Floating Button</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Galeri</string>
+    <string name="upload">Upload</string>
+</resources>
