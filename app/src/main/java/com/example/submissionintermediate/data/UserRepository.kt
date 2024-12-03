@@ -1,22 +1,31 @@
 package com.example.submissionintermediate.data
 
+import androidx.lifecycle.LiveData
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.liveData
 import com.example.submissionintermediate.data.pref.UserModel
 import com.example.submissionintermediate.data.pref.UserPreference
 import com.example.submissionintermediate.data.response.AddStoryResponse
-import com.example.submissionintermediate.data.response.DetailStoryResponse
+import com.example.submissionintermediate.data.response.ListStoryItem
 import com.example.submissionintermediate.data.response.ListStoryResponse
 import com.example.submissionintermediate.data.response.LoginResult
 import com.example.submissionintermediate.data.response.Story
 import com.example.submissionintermediate.data.retrofit.ApiService
+import com.example.submissionintermediate.database.StoriesDatabase
+import com.example.submissionintermediate.paging.StoriesPagingSource
+import com.example.submissionintermediate.paging.StoriesRemoteMediator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.HttpException
-import retrofit2.Response
 
 class UserRepository private constructor(
+    private val storiesDatabase: StoriesDatabase,
     private val userPreference: UserPreference,
     private val apiService: ApiService
 ) {
@@ -52,10 +61,24 @@ class UserRepository private constructor(
             Result.failure(e)
         }
     }
-    suspend fun getStories(token: String): Result<ListStoryResponse> {
+    fun getStories(token: String): LiveData<PagingData<ListStoryItem>> {
+        @OptIn(ExperimentalPagingApi::class)
+        return Pager(
+            config = PagingConfig(
+                pageSize = 5
+            ),
+
+            remoteMediator = StoriesRemoteMediator(storiesDatabase, apiService, "Bearer $token"),
+            pagingSourceFactory = {
+//                StoriesPagingSource(apiService,"Bearer $token" )
+                storiesDatabase.storiesDao().getAllStories()
+            }
+        ).liveData
+    }
+    suspend fun getStoriesWithLocation(token: String, location: Int = 1): Result<ListStoryResponse> {
         return try {
             val response = withContext(Dispatchers.IO) {
-                apiService.getStories("Bearer $token")
+                apiService.getStoriesWithLocation("Bearer $token", location)
             }
             Result.success(response)
         } catch (e: Exception) {
@@ -82,11 +105,13 @@ class UserRepository private constructor(
     suspend fun uploadImage(
         token: String,
         file: MultipartBody.Part,
-        description: RequestBody
+        description: RequestBody,
+        lat: RequestBody,
+        lon: RequestBody
     ): Result<AddStoryResponse> {
         return try {
             val response = withContext(Dispatchers.IO) {
-                apiService.uploadStory("Bearer $token", file, description)
+                apiService.uploadStory("Bearer $token", file, description, lat, lon)
             }
             Result.success(response)
         } catch (e: Exception) {
@@ -111,11 +136,12 @@ class UserRepository private constructor(
         @Volatile
         private var instance: UserRepository? = null
         fun getInstance(
+            storiesDatabase: StoriesDatabase,
             userPreference: UserPreference,
             apiService: ApiService
         ): UserRepository =
             instance ?: synchronized(this) {
-                instance ?: UserRepository(userPreference, apiService)
+                instance ?: UserRepository(storiesDatabase,userPreference, apiService)
             }.also { instance = it }
     }
 

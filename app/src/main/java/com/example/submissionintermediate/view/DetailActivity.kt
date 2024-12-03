@@ -1,20 +1,14 @@
 package com.example.submissionintermediate.view
 
-import android.content.Intent
+
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.WindowInsetsController
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.example.submissionintermediate.R
 import com.example.submissionintermediate.databinding.ActivityDetailBinding
-import com.example.submissionintermediate.view.auth.LoginActivity
 import com.example.submissionintermediate.viewmodel.MainViewModel
 import com.example.submissionintermediate.viewmodel.ViewModelFactory
 import kotlinx.coroutines.launch
@@ -63,13 +57,17 @@ class DetailActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             detailViewModel.detailstories.collect { result ->
-                result?.onSuccess {
+                result?.onSuccess {detail->
                     Glide.with(this@DetailActivity)
-                        .load(it.photoUrl)
+                        .load(detail.photoUrl)
                         .into(binding.ivDetailPhoto)
 
-                    binding.tvDetailName.text = it.name
-                    binding.tvDetailDescription.text = it.description
+                    binding.tvDetailName.text = detail.name
+                    binding.tvDetailDescription.text = detail.description
+                    "Lat: ${detail.lat?.toString() ?: "N/A"}".also { binding.tvDetailLat.text = it }
+                    "Lon: ${detail.lon?.toString() ?: "N/A"}".also { binding.tvDetailLon.text = it }
+
+
                 }?.onFailure {
                     // Handle the error
                 }

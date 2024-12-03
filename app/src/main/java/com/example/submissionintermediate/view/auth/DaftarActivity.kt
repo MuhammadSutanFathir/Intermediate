@@ -1,5 +1,7 @@
 package com.example.submissionintermediate.view.auth
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Build
@@ -8,15 +10,9 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.Observer
-import com.example.submissionintermediate.R
 import com.example.submissionintermediate.databinding.ActivityDaftarBinding
-import com.example.submissionintermediate.databinding.ActivityLoginBinding
 import com.example.submissionintermediate.viewmodel.MainViewModel
 import com.example.submissionintermediate.viewmodel.ViewModelFactory
 
@@ -32,11 +28,15 @@ class DaftarActivity : AppCompatActivity() {
         binding = ActivityDaftarBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.login.setOnClickListener {
-            startActivity(Intent(this, LoginActivity::class.java))
+            val intent = Intent(this, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            startActivity(intent)
         }
         setupView()
         setupAction()
         observeViewModel()
+        playAnimation()
 
     }
 
@@ -53,9 +53,9 @@ class DaftarActivity : AppCompatActivity() {
     }
     private fun setupAction() {
         binding.daftarButton.setOnClickListener {
-            val name = binding.fullNameEditText.text.toString()
-            val email = binding.emailEditText.text.toString()
-            val password = binding.passwordEditText.text.toString()
+            val name = binding.edRegisterName.text.toString()
+            val email = binding.edRegisterEmail.text.toString()
+            val password = binding.edRegisterPassword.text.toString()
 
             if (name.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
                 registerViewModel.register(name, email, password)
@@ -110,5 +110,43 @@ class DaftarActivity : AppCompatActivity() {
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+    private fun playAnimation() {
+        ObjectAnimator.ofFloat(binding.daftarLogo, View.TRANSLATION_X, -30f, 30f).apply {
+            duration = 6000
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+        }.start()
+
+        ObjectAnimator.ofFloat(binding.roundedView, View.TRANSLATION_X, -30f, 30f).apply {
+            duration = 6000
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+        }.start()
+
+        val nameText = ObjectAnimator.ofFloat(binding.fullNameEditText, View.ALPHA, 1f).setDuration(100)
+        val emailText = ObjectAnimator.ofFloat(binding.emailEditText, View.ALPHA, 1f).setDuration(100)
+        val passwordText =
+            ObjectAnimator.ofFloat(binding.passwordEditText, View.ALPHA, 1f).setDuration(100)
+        val name = ObjectAnimator.ofFloat(binding.edRegisterName, View.ALPHA, 1f).setDuration(100)
+        val email = ObjectAnimator.ofFloat(binding.edRegisterEmail, View.ALPHA, 1f).setDuration(100)
+        val password =
+            ObjectAnimator.ofFloat(binding.edRegisterPassword, View.ALPHA, 1f).setDuration(100)
+        val linear =
+            ObjectAnimator.ofFloat(binding.linearLayoutRegister, View.ALPHA, 1f).setDuration(100)
+        val login = ObjectAnimator.ofFloat(binding.daftarButton, View.ALPHA, 1f).setDuration(100)
+
+        val together = AnimatorSet().apply {
+            playTogether(name, nameText,email,emailText,passwordText,password)
+        }
+        AnimatorSet().apply {
+            playSequentially(
+                together,
+                login,
+                linear
+            )
+
+            startDelay = 100
+        }.start()
     }
 }

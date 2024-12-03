@@ -15,6 +15,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
     @FormUrlEncoded
@@ -35,6 +36,14 @@ interface ApiService {
     @GET("/v1/stories")
     suspend fun getStories(
         @Header("Authorization") token: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): ListStoryResponse
+
+    @GET("/v1/stories")
+    suspend fun getStoriesWithLocation(
+        @Header("Authorization") token: String,
+        @Query("location") location : Int = 1,
     ): ListStoryResponse
 
     @GET("/v1/stories/{id}")
@@ -49,6 +58,8 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Part file: MultipartBody.Part,
         @Part("description") description: RequestBody,
+        @Part("lat") lat: RequestBody?, // Optional latitude
+        @Part("lon") lon: RequestBody?
     ): AddStoryResponse
 
 }

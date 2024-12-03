@@ -7,22 +7,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.submissionintermediate.data.UserRepository
 import com.example.submissionintermediate.data.pref.UserModel
-import com.example.submissionintermediate.data.response.DetailStoryResponse
 import com.example.submissionintermediate.data.response.ListStoryItem
 import com.example.submissionintermediate.data.response.ListStoryResponse
-import com.example.submissionintermediate.data.response.LoginResponse
-import com.example.submissionintermediate.data.response.LoginResult
-import com.example.submissionintermediate.data.response.RegisterResponse
 import com.example.submissionintermediate.data.response.Story
-import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.HttpException
 
 
 class MainViewModel(private val userRepository: UserRepository) : ViewModel() {
@@ -47,6 +43,10 @@ class MainViewModel(private val userRepository: UserRepository) : ViewModel() {
 
     private val _stories = MutableStateFlow<Result<ListStoryResponse>?>(null)
     val stories: StateFlow<Result<ListStoryResponse>?> get() = _stories
+
+    private val _storiesWithLocation = MutableLiveData<Result<ListStoryResponse>?>()
+    val storiesWithLocation: LiveData<Result<ListStoryResponse>?> get() = _storiesWithLocation
+
 
     fun getSession(): LiveData<UserModel> {
         return userRepository.getSession().asLiveData()
@@ -114,11 +114,25 @@ class MainViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
-    fun fetchStories(token: String) {
+    fun fetchStories(token: String):LiveData<PagingData<ListStoryItem>> = userRepository.getStories(token).cachedIn(viewModelScope)
+
+    fun fetchStoriesWithLocation(token: String, location: Int = 1) {
+        _isLoading.value = true
         viewModelScope.launch {
-            _stories.value = userRepository.getStories(token)
+            val result = userRepository.getStoriesWithLocation(token, location)
+
+            result.onSuccess {
+                _storiesWithLocation.value = result
+                _isLoading.value = false
+                clearErrorMessage()
+            }.onFailure {
+                _storiesWithLocation.value = Result.failure(it)
+                _isLoading.value = false
+                _errorMessage.value = it.message
+            }
         }
     }
+
 
     fun getDetailStories(token: String, id: String) {
         viewModelScope.launch {
@@ -129,11 +143,13 @@ class MainViewModel(private val userRepository: UserRepository) : ViewModel() {
     fun uploadStory(
         token: String,
         file: MultipartBody.Part,
-        description: RequestBody
+        description: RequestBody,
+        lat: RequestBody,
+        lon: RequestBody
     ) {
         _isLoading.value = true
         viewModelScope.launch {
-            val result = userRepository.uploadImage(token,file, description)
+            val result = userRepository.uploadImage(token,file, description, lat, lon)
             result.onSuccess {
                 _upload.value = true
                 _isLoading.value = false

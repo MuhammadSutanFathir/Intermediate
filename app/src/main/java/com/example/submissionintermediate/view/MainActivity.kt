@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.submissionintermediate.R
+import com.example.submissionintermediate.adapter.LoadingStateAdapter
 import com.example.submissionintermediate.adapter.StoriesAdapter
 import com.example.submissionintermediate.data.response.ListStoryItem
 import com.example.submissionintermediate.databinding.ActivityMainBinding
@@ -36,27 +36,19 @@ class MainActivity : AppCompatActivity() {
             binding.progressBar.visibility = View.GONE
         }
     }
-    private fun setEventData(data: List<ListStoryItem>) {
+    private fun getData(token: String) {
         val adapter = StoriesAdapter()
-        adapter.submitList(data)
-
-        binding.rvStories.adapter = adapter
-    }
-    private fun checkUserSession() {
-        // Check if the user is logged in by examining the session
-        mainViewModel.getSession().observe(this) { user ->
-            if (user.isLogin) {
-                Log.d("UserSession", "Get session: $user")
-                // User is logged in, proceed with loading stories
-                mainViewModel.fetchStories(user.token)
-
-            } else {
-                val intent = Intent(this, LoginActivity::class.java)
-                startActivity(intent)
-                finish()
+        binding.rvStories.adapter = adapter.withLoadStateFooter(
+            footer = LoadingStateAdapter {
+                adapter.retry()
             }
+        )
+        mainViewModel.fetchStories(token).observe(this) {
+            adapter.submitData(lifecycle, it)
+            showLoading(false)
         }
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         // Optionally, change the title text color (if ActionBar is visible)
-        supportActionBar?.setTitle("Beranda")
+        supportActionBar?.title = "Beranda"
 
         val layoutManager = LinearLayoutManager(this)
         binding.rvStories.layoutManager = layoutManager
@@ -80,23 +72,22 @@ class MainActivity : AppCompatActivity() {
             showLoading(it)
         }
 
-        lifecycleScope.launch {
-            mainViewModel.stories.collect { result ->
-                result?.onSuccess { listStoryResponse ->
-                    setEventData(listStoryResponse.listStory)
-                }?.onFailure {
-                    // Handle the error
-                }
+
+        mainViewModel.getSession().observe(this) { user ->
+            if (user.isLogin) {
+                Log.d("UserSession", "Get session: $user")
+                // User is logged in, proceed with loading stories
+                getData(user.token)
+
             }
         }
-
-        checkUserSession()
 
     }
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_stories, menu)
+        menuInflater.inflate(R.menu.menu_maps, menu)
         return true
     }
 
@@ -110,8 +101,14 @@ class MainActivity : AppCompatActivity() {
                         Toast.makeText(this, "Logout Success", Toast.LENGTH_SHORT).show()
                         val intent = Intent(this, LoginActivity::class.java)
                         startActivity(intent)
+                        finish()
                     }
                 }
+                true
+            }
+            R.id.action_maps -> {
+                val intent = Intent(this, MapsActivity::class.java)
+                startActivity(intent)
                 true
             }
             else -> super.onOptionsItemSelected(item)

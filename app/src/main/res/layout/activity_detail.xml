@@ -65,5 +65,33 @@
             android:layout_marginVertical="10dp"
             android:layout_marginHorizontal="8dp"/>
 
+        <TextView
+            android:id="@+id/tv_detail_lat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@color/black"
+            tools:text="Additional Information 1"
+            app:layout_constraintTop_toBottomOf="@+id/tv_detail_description"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginVertical="10dp"
+            android:layout_marginHorizontal="8dp"/>
+
+        <!-- New TextView 2 -->
+        <TextView
+            android:id="@+id/tv_detail_lon"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@color/black"
+            tools:text="Additional Information 2"
+            app:layout_constraintTop_toBottomOf="@+id/tv_detail_lat"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginVertical="10dp"
+            android:layout_marginHorizontal="8dp"/>
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

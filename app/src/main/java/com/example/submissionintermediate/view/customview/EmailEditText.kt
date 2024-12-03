@@ -3,15 +3,11 @@ package com.example.submissionintermediate.view.customview
 import android.content.Context
 import android.graphics.Canvas
 import android.text.Editable
-import android.text.InputType.TYPE_CLASS_TEXT
-import android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.util.Patterns
 import android.view.View
 import androidx.appcompat.widget.AppCompatEditText
-import androidx.core.content.ContextCompat
-import com.example.submissionintermediate.R
 
 class EmailEditText @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null

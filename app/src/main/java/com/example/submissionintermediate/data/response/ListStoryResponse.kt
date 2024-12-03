@@ -1,5 +1,8 @@
 package com.example.submissionintermediate.data.response
 
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 data class ListStoryResponse(
@@ -13,7 +16,7 @@ data class ListStoryResponse(
 	@field:SerializedName("message")
 	val message: String
 )
-
+@Entity(tableName = "stories")
 data class ListStoryItem(
 
 	@field:SerializedName("photoUrl")
@@ -29,11 +32,12 @@ data class ListStoryItem(
 	val description: String,
 
 	@field:SerializedName("lon")
-	val lon: Any,
+	val lon: Double?,
 
+	@PrimaryKey
 	@field:SerializedName("id")
 	val id: String,
 
 	@field:SerializedName("lat")
-	val lat: Any
+	val lat: Double?
 )

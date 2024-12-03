@@ -66,6 +66,13 @@
             android:layout_gravity="center"
             tools:visibility="visible" />
 
+        <CheckBox
+            android:id="@+id/location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/location"
+            android:layout_marginBottom="16dp" />
+
         <EditText
             android:id="@+id/ed_add_description"
             android:layout_width="match_parent"
@@ -73,6 +80,8 @@
             android:layout_marginBottom="24dp"
             android:background="@android:drawable/edit_text"
             android:hint="@string/description"
+            android:importantForAutofill="no"
+            android:inputType="text"
             android:minHeight="200dp"
             android:padding="8dp" />
 

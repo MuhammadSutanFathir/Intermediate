@@ -9,8 +9,7 @@ import android.view.View
 import androidx.appcompat.widget.AppCompatEditText
 import android.text.InputType.TYPE_CLASS_TEXT
 import android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-import androidx.core.content.ContextCompat
-import com.example.submissionintermediate.R
+
 
 class PasswordEditText @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null

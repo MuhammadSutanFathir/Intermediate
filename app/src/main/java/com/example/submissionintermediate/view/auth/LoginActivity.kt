@@ -1,5 +1,7 @@
 package com.example.submissionintermediate.view.auth
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Build
@@ -7,15 +9,8 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
-import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.Observer
-import com.example.submissionintermediate.R
-import com.example.submissionintermediate.data.pref.UserModel
 import com.example.submissionintermediate.databinding.ActivityLoginBinding
 import com.example.submissionintermediate.view.MainActivity
 import com.example.submissionintermediate.viewmodel.MainViewModel
@@ -34,13 +29,16 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.daftar.setOnClickListener {
-            startActivity(Intent(this, DaftarActivity::class.java))
+            val intent = Intent(this, DaftarActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            startActivity(intent)
         }
 
         setupView()
         setupAction()
         observeViewModel()
-
+        playAnimation()
     }
     private fun setupView() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -56,8 +54,8 @@ class LoginActivity : AppCompatActivity() {
 
     private fun setupAction() {
         binding.loginButton.setOnClickListener {
-            val email = binding.emailEditText.text.toString()
-            val password = binding.passwordEditText.text.toString()
+            val email = binding.edLoginEmail.text.toString()
+            val password = binding.edLoginPassword.text.toString()
             loginViewModel.login(email, password)
         }
     }
@@ -65,7 +63,7 @@ class LoginActivity : AppCompatActivity() {
     private fun observeViewModel() {
         loginViewModel.isLoginSuccessful.observe(this) { isSuccessful ->
             if (isSuccessful) {
-                navigateToMain()
+                navigateToLogin()
             }
         }
 
@@ -81,7 +79,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun navigateToMain() {
+    private fun navigateToLogin() {
         val intent = Intent(this@LoginActivity, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
         }
@@ -103,4 +101,41 @@ class LoginActivity : AppCompatActivity() {
     private fun showLoading(isLoading: Boolean) {
         binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
+    private fun playAnimation() {
+        ObjectAnimator.ofFloat(binding.loginLogo, View.TRANSLATION_X, -30f, 30f).apply {
+            duration = 6000
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+        }.start()
+
+        ObjectAnimator.ofFloat(binding.roundedView, View.TRANSLATION_X, -30f, 30f).apply {
+            duration = 6000
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+        }.start()
+
+        val emailText = ObjectAnimator.ofFloat(binding.emailEditText, View.ALPHA, 1f).setDuration(100)
+        val passwordText =
+            ObjectAnimator.ofFloat(binding.passwordEditText, View.ALPHA, 1f).setDuration(100)
+        val email = ObjectAnimator.ofFloat(binding.edLoginEmail, View.ALPHA, 1f).setDuration(100)
+        val password =
+            ObjectAnimator.ofFloat(binding.edLoginPassword, View.ALPHA, 1f).setDuration(100)
+        val linear =
+            ObjectAnimator.ofFloat(binding.linearLayoutLogin, View.ALPHA, 1f).setDuration(100)
+        val login = ObjectAnimator.ofFloat(binding.loginButton, View.ALPHA, 1f).setDuration(100)
+
+        val together = AnimatorSet().apply {
+            playTogether(email,emailText,passwordText,password)
+        }
+        AnimatorSet().apply {
+            playSequentially(
+                together,
+                login,
+                linear
+            )
+
+            startDelay = 100
+        }.start()
+    }
+
 }

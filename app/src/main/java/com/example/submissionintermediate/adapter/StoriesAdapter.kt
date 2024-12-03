@@ -3,6 +3,7 @@ package com.example.submissionintermediate.adapter
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -13,7 +14,7 @@ import com.example.submissionintermediate.view.DetailActivity
 import com.example.submissionintermediate.view.DetailActivity.Companion.EXTRA_ID
 
 
-class StoriesAdapter : ListAdapter<ListStoryItem, StoriesAdapter.StoriesViewHolder>(diffCallback){
+class StoriesAdapter : PagingDataAdapter<ListStoryItem, StoriesAdapter.StoriesViewHolder>(diffCallback){
     class StoriesViewHolder(private val binding: ItemStoriesBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind (stories: ListStoryItem) {
             binding.tvItemName.text = stories.name
@@ -34,8 +35,10 @@ class StoriesAdapter : ListAdapter<ListStoryItem, StoriesAdapter.StoriesViewHold
     }
 
     override fun onBindViewHolder(holder: StoriesViewHolder, position: Int) {
-        val stories = getItem(position)
-        holder.bind(stories)
+        val data = getItem(position)
+        if (data != null) {
+            holder.bind(data)
+        }
     }
 
     companion object {
