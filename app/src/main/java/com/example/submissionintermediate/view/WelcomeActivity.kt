@@ -13,16 +13,9 @@ import com.example.submissionintermediate.databinding.ActivityWelcomeBinding
 import com.example.submissionintermediate.view.auth.DaftarActivity
 import com.example.submissionintermediate.view.auth.LoginActivity
 import android.provider.Settings
-import android.util.Log
-import androidx.activity.viewModels
-import com.example.submissionintermediate.viewmodel.MainViewModel
-import com.example.submissionintermediate.viewmodel.ViewModelFactory
 
 class WelcomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityWelcomeBinding
-    private val welcomeViewModel by viewModels<MainViewModel> {
-        ViewModelFactory.getAuthInstance(this)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,14 +26,7 @@ class WelcomeActivity : AppCompatActivity() {
         setupAction()
         playAnimation()
 
-        welcomeViewModel.getSession().observe(this) { user ->
-            if (user.isLogin) {
-                Log.d("UserSession", "Get session: $user")
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-                finish()
-            }
-        }
+
     }
 
     private fun setupView() {

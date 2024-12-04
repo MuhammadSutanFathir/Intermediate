@@ -74,12 +74,14 @@ class MainActivity : AppCompatActivity() {
 
 
         mainViewModel.getSession().observe(this) { user ->
-            if (user.isLogin) {
-                Log.d("UserSession", "Get session: $user")
-                // User is logged in, proceed with loading stories
-                getData(user.token)
-
+            val token = user.token
+            if (!user.isLogin) {
+                startActivity(Intent(this, WelcomeActivity::class.java))
+                finish()
             }
+            getData(token)
+            Log.d("UserSession", "Session cleared successfully.")
+
         }
 
     }

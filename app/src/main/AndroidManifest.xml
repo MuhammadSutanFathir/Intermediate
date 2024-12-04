@@ -43,7 +43,7 @@
             android:exported="false"
             android:label="@string/title_activity_maps" />
         <activity
-            android:name=".view.MainActivity"
+            android:name=".view.WelcomeActivity"
             android:exported="false" />
         <activity
             android:name=".view.CameraActivity"
@@ -61,7 +61,7 @@
             android:name=".view.auth.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".view.WelcomeActivity"
+            android:name=".view.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

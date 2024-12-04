@@ -78,6 +78,9 @@ dependencies {
     androidTestImplementation(libs.androidx.runner)
     androidTestImplementation(libs.androidx.rules)
     implementation(libs.androidx.espresso.idling.resource)
+    androidTestImplementation(libs.espresso.intents)
+    androidTestImplementation(libs.mockwebserver)
+    androidTestImplementation(libs.okhttp3.okhttp.tls)
 
     testImplementation(libs.androidx.core.testing) // InstantTaskExecutorRule
     testImplementation(libs.kotlinx.coroutines.test) //TestDispatcher
